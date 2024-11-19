@@ -30,6 +30,7 @@
     { "Day": 27, "TestsCompleted": 987000, "PercentageScreened": 6.95 },
     { "Day": 28, "TestsCompleted": 992000, "PercentageScreened": 6.99 },
     { "Day": 29, "TestsCompleted": 997000, "PercentageScreened": 7.02 },
-    { "Day": 30, "TestsCompleted": 1002000, "PercentageScreened": 7.06 }
+    { "Day": 30, "TestsCompleted": 1002000, "PercentageScreened": 7.06 },
+    { "Day": 31, "TestsCompleted": 1007000, "PercentageScreened": 7.1 }
   ]
 }
