@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moving the Needle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #needle-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+    #needle {
+      position: absolute;
+      width: 2px;
+      height: 100px;
+      background: red;
+      transform-origin: bottom center;
+      top: 50%;
+      left: 50%;
+      transition: transform 1s ease-in-out;
+    }
+    #percentage {
+      margin-top: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Moving the Needle</h1>
+  <div id="needle-container">
+    <div id="needle"></div>
+  </div>
+  <div id="percentage">Loading...</div>
+
+  <script>
+    const jsonUrl = 'https://tvdcdev.github.io/proj-moving-the-needle/moving_the_needle_mock_data.json';
+
+    fetch(jsonUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const totalEligible = data.totalEligible;
+        const latestUpdate = data.dailyUpdates[data.dailyUpdates.length - 1]; // Get the last day's update
+        const tested = latestUpdate.TestsCompleted;
+
+        updateUI(totalEligible, tested, latestUpdate.PercentageScreened);
+      })
+      .catch(error => {
+        console.error('Failed to fetch data:', error);
+      });
+
+    function updateUI(totalEligible, tested, percentageScreened) {
+      if (!totalEligible || !tested || !percentageScreened) {
+        console.error('Data is incomplete or invalid');
+        return;
+      }
+
+      const needleElement = document.getElementById('needle');
+      const percentageElement = document.getElementById('percentage');
+
+      percentageElement.textContent = `${percentageScreened}% tested (${tested.toLocaleString()} out of ${totalEligible.toLocaleString()})`;
+
+      // Adjust needle rotation (assuming -90deg is 0% and +90deg is 100%)
+      const rotation = -90 + (percentageScreened * 1.8); // 180deg span for 100%
+      needleElement.style.transform = `rotate(${rotation}deg)`;
+    }
+  </script>
+</body>
+</html>

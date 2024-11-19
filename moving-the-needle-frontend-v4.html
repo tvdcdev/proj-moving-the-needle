@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moving the Needle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #needleCanvas {
+      display: block;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Moving the Needle</h1>
+  <canvas id="needleCanvas" width="300" height="150"></canvas>
+  <p id="needleText">Loading...</p>
+  <script>
+    const dataUrl = "https://tvdcdev.github.io/proj-moving-the-needle/moving_the_needle_mock_data.json";
+    const canvas = document.getElementById("needleCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function updateUI(tested, total, percentage) {
+      const needleText = document.getElementById("needleText");
+      needleText.textContent = `${percentage.toFixed(2)}% tested (${tested.toLocaleString()} out of ${total.toLocaleString()})`;
+      drawNeedle(ctx, percentage);
+    }
+
+    function drawNeedle(ctx, percentage) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height;
+      const radius = canvas.width / 2 - 10; // Adjust to fit half-circle
+      const startAngle = Math.PI; // Start at the leftmost point (half-circle)
+      const endAngle = Math.PI + (Math.PI * (percentage / 100)); // Map percentage to half-circle
+
+      // Draw base half-circle (background)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI);
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#ddd";
+      ctx.stroke();
+
+      // Draw the progress half-circle
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "red"; // Color of the progress arc
+      ctx.stroke();
+
+      // Draw the needle
+      const needleAngle = endAngle; // Angle for the needle
+      const needleLength = radius - 5; // Length of the needle
+      const needleX = centerX + needleLength * Math.cos(needleAngle);
+      const needleY = centerY + needleLength * Math.sin(needleAngle);
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY); // Start at the center
+      ctx.lineTo(needleX, needleY); // Draw to the edge
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "black"; // Color of the needle
+      ctx.stroke();
+
+      // Draw a small circle at the center for aesthetics
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = "black"; // Center circle color
+      ctx.fill();
+    }
+
+    async function fetchData() {
+      try {
+        const response = await fetch(dataUrl);
+        const data = await response.json();
+        const latestEntry = data.dailyUpdates[data.dailyUpdates.length - 1];
+        updateUI(latestEntry.TestsCompleted, data.totalEligible, latestEntry.PercentageScreened);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving the Needle - Cizzle Bio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .needle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 5px solid #ccc;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .needle {
+            position: absolute;
+            width: 10px;
+            height: 150px;
+            background: #007bff;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease-out;
+        }
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .stats p {
+            margin: 5px 0;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Moving the Needle</h1>
+    <div class="needle-container">
+        <div class="needle" id="needle"></div>
+    </div>
+    <div class="stats" id="stats">
+        <p><strong>14,200,000</strong> individuals eligible for screening</p>
+        <p><span id="tested">0</span> tested so far</p>
+        <p><strong><span id="percentage">0</span>%</strong> progress</p>
+    </div>
+
+    <script>
+        const jsonURL = "https://tvdcdev.github.io/proj-moving-the-needle/moving_the_needle_mock_data.json";
+
+        async function fetchData() {
+            try {
+                const response = await fetch(jsonURL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                updateUI(data);
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        }
+
+        function updateUI(data) {
+            const totalEligible = 14200000; // Total eligible individuals for screening
+            const tested = data.totalTested; // Get tested value from JSON
+            const percentage = ((tested / totalEligible) * 100).toFixed(2);
+
+            document.getElementById("tested").textContent = tested.toLocaleString();
+            document.getElementById("percentage").textContent = percentage;
+
+            // Update needle rotation
+            const needle = document.getElementById("needle");
+            const rotation = (percentage / 100) * 180; // Map percentage to 0-180 degrees
+            needle.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        // Refresh data every 30 seconds
+        setInterval(fetchData, 30000);
+        fetchData();
+    </script>
+</body>
+</html>
